@@ -18,6 +18,9 @@ class CommandParser:
         file_parser = self.subparsers.add_parser('file', help='File operations')
         file_subparsers = file_parser.add_subparsers(dest='subcommand')
         
+        # File GUI
+        file_subparsers.add_parser('gui', help='Launch file operations GUI')
+
         # File search
         search_parser = file_subparsers.add_parser('search', help='Search for files')
         search_parser.add_argument('-p', '--pattern', required=True, help='Search pattern')
@@ -98,6 +101,11 @@ class CommandParser:
         """
         if args is None:
             args = sys.argv[1:]
+
+        # Special case for just 'file' command - will be handled in main.py
+        if len(args) == 1 and args[0] == 'file':
+            parsed_args = self.parser.parse_args(['file', 'gui'])
+            return parsed_args
             
         if not args:
             self.parser.print_help()

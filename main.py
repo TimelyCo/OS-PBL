@@ -16,6 +16,13 @@ from modules.file_ops import FileOperations
 from modules.process_mgmt import ProcessManager
 from modules.network_utils import NetworkUtilities
 
+# Import GUI for file operations
+try:
+    from modules.file_ops_gui import FileOperationsGUI
+except ImportError as e:
+    print(f"Error: Could not import FileOperationsGUI. Details: {e}")
+    sys.exit(1)
+
 
 def main():
     """
@@ -27,6 +34,16 @@ def main():
     
     # Parse command line arguments
     parser = CommandParser()
+
+    # Check if we're launching file operations without subcommand
+    if len(sys.argv) > 1 and sys.argv[1] == 'file' and (len(sys.argv) == 2 or sys.argv[2].startswith('-')):
+        # Launch the GUI for file operations
+        print("Starting File Operations GUI...")
+        app = FileOperationsGUI()
+        app.protocol("WM_DELETE_WINDOW", app.on_closing)
+        app.mainloop()
+        return 0
+    
     args = parser.parse_args()
     
     try:
