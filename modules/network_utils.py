@@ -216,3 +216,53 @@ class NetworkUtilities:
                 return f"{bytes_value:.1f}{unit}"
             bytes_value /= 1024
         return f"{bytes_value:.1f}PB"
+    
+    def traceroute(self, target):
+        """Perform a traceroute to the specified target"""
+        self.logger.info(f"Running traceroute to {target}")
+        print(f"Traceroute to {target}:\n")
+
+        try:
+            if os.name == 'nt':
+                cmd = ['tracert', target]
+            else:
+                cmd = ['traceroute', target]
+
+            result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+            print(result.stdout)
+        except Exception as e:
+            self.logger.error(f"Error running traceroute: {str(e)}")
+            print(f"Error running traceroute: {str(e)}")
+
+    def ping_sweep(self, subnet):
+        """Perform a ping sweep across a subnet"""
+        self.logger.info(f"Performing ping sweep on {subnet}")
+        print(f"Pinging all hosts in {subnet}...\n")
+
+        try:
+            network = ipaddress.ip_network(subnet, strict=False)
+            live_hosts = []
+
+            def ping_host(ip):
+                param = '-n' if os.name == 'nt' else '-c'
+                result = subprocess.run(['ping', param, '1', str(ip)],
+                                        stdout=subprocess.DEVNULL,
+                                        stderr=subprocess.DEVNULL)
+                if result.returncode == 0:
+                    live_hosts.append(str(ip))
+                    print(f"{ip} is up")
+
+            threads = []
+            for ip in network.hosts():
+                t = threading.Thread(target=ping_host, args=(ip,))
+                t.start()
+                threads.append(t)
+
+            for t in threads:
+                t.join()
+
+            print(f"\nPing sweep complete. {len(live_hosts)} host(s) up.")
+
+        except Exception as e:
+            self.logger.error(f"Error in ping sweep: {str(e)}")
+            print(f"Error in ping sweep: {str(e)}")

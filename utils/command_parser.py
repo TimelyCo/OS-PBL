@@ -18,9 +18,6 @@ class CommandParser:
         file_parser = self.subparsers.add_parser('file', help='File operations')
         file_subparsers = file_parser.add_subparsers(dest='subcommand')
         
-        # File GUI
-        file_subparsers.add_parser('gui', help='Launch file operations GUI')
-
         # File search
         search_parser = file_subparsers.add_parser('search', help='Search for files')
         search_parser.add_argument('-p', '--pattern', required=True, help='Search pattern')
@@ -65,6 +62,15 @@ class CommandParser:
         net_monitor_parser = net_subparsers.add_parser('monitor', help='Monitor network traffic')
         net_monitor_parser.add_argument('-i', '--interface', help='Network interface to monitor')
         net_monitor_parser.add_argument('-f', '--filter', help='Packet filter expression')
+
+        # Network traceroute
+        traceroute_parser = net_subparsers.add_parser('traceroute', help='Perform a traceroute to a target')
+        traceroute_parser.add_argument('-t', '--target', required=True, help='Target host or IP for traceroute')
+
+        # Network ping sweep
+        pingsweep_parser = net_subparsers.add_parser('pingsweep', help='Perform a ping sweep on a subnet')
+        pingsweep_parser.add_argument('-s', '--subnet', required=True, help='Subnet in CIDR notation (e.g., 192.168.1.0/24)')
+
         
         # Security Checks
         sec_parser = self.subparsers.add_parser('sec', help='Security checks')
@@ -101,11 +107,6 @@ class CommandParser:
         """
         if args is None:
             args = sys.argv[1:]
-
-        # Special case for just 'file' command - will be handled in main.py
-        if len(args) == 1 and args[0] == 'file':
-            parsed_args = self.parser.parse_args(['file', 'gui'])
-            return parsed_args
             
         if not args:
             self.parser.print_help()

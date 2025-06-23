@@ -52,7 +52,7 @@ class FileOperations:
         
         try:
             if not os.path.exists(filepath):
-                print(f"Error: File '{filepath}' not found")
+                print(f"Error: File '{filepath}' asd dsfasd")
                 return
                 
             file_info = os.stat(filepath)
